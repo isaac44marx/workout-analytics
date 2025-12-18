@@ -1,12 +1,58 @@
+// src/app.js
+// This is the main entry point for the application.
+// Its job is wiring: configuration + connecting pieces together.
+
+const path = require("path");
 const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+
+// Import route definitions
+const pageRoutes = require("./routes/pages");
 
 const app = express();
 const PORT = 3000;
 
-app.get("/", (req, res) => {
-  res.send("Workout Analytics server is running.");
-});
+/*
+  VIEW ENGINE SETUP
+  -----------------
+  Tell Express:
+  - where view templates live
+  - which template engine to use
+*/
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 
+/*
+  LAYOUT SETUP
+  ------------
+  Enable layouts and tell Express which layout file to use
+*/
+app.use(expressLayouts);
+app.set("layout", "partials/layout");
+
+/*
+  STATIC FILES
+  ------------
+  Serve files from /public at the root URL.
+  Example:
+    public/styles.css → http://localhost:3000/styles.css
+*/
+app.use(express.static(path.join(__dirname, "..", "public")));
+
+/*
+  ROUTES
+  ------
+  Hand off request handling to the routes module.
+  This means:
+    "/" and "/analytics" are defined elsewhere.
+*/
+app.use("/", pageRoutes);
+
+/*
+  START SERVER
+  ------------
+  Begin listening for incoming HTTP requests
+*/
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });
