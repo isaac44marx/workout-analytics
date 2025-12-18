@@ -20,3 +20,20 @@ When you solve something tricky:
 That’s how you actually retain syntax.
 
 ---
+
+## Project Concepts
+A web app has two essential pieces:
+
+A server
+
+a program that listens for HTTP requests
+
+responds with HTML, JSON, etc.
+
+A client (browser)
+
+sends HTTP requests
+
+renders the responses
+
+“Web app” does not automatically mean “on the internet.”
