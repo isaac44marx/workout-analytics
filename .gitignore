@@ -15,3 +15,6 @@ Thumbs.db
 
 # VS Code workspace state (not settings sync)
 .vscode/
+
+# Personal reference notes (do not commit)
+docs/99-reference.md
