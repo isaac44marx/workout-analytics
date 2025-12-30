@@ -1,3 +1,74 @@
+# Database schema draft
+
+## exercises
+
+**Purpose:** Canonical list of exercises.
+
+| Column | Type | Null | Key | Default | Notes |
+|---|---|---|---|---|---|
+| id | bigint | not null | PK | generated | |
+| name | text | not null | UQ |  | unique exercise name |
+| category | text | null |  |  | push/pull/legs |
+| created_at | timestamptz | not null |  | now() | |
+
+**Constraints**
+- name must be non-empty
+- unique lower(name) (case-insensitive)
+
+**Indexes**
+- (optional later) index on lower(name)
+
+---
+
+## workout_sessions
+
+**Purpose:** One workout event (a day at the gym). Acts as the grouping unit for sets and many analytics.
+
+| Column | Type | Null | Key | Default | Notes |
+|---|---|---|---|---|---|
+| id | bigint | not null | PK | generated | |
+| session_date | date | not null | | | calendar date of workout |
+| notes | text | null | | | optional session notes |
+| created_at | timestamptz | not null | | now() | |
+
+**Constraints**
+- session_date must be present
+
+**Indexes**
+- (optional later) index on session_date
+
+---
+
+## set_entries
+
+**Purpose:** Each logged set, attached to a session and an exercise. This is the core “fact table” for analytics.
+
+| Column | Type | Null | Key | Default | Notes |
+|---|---|---|---|---|---|
+| id | bigint | not null | PK | generated | |
+| session_id | bigint | not null | FK | | references workout_sessions.id |
+| exercise_id | bigint | not null | FK | | references exercises.id |
+| set_number | int | null | | | |
+| reps | int | not null | | | |
+| weight | numeric | not null | | | |
+| unit | text | not null | | | 'lb' or 'kg' |
+| rpe | numeric | null | | | |
+| notes | text | null | | | |
+| created_at | timestamptz | not null | | now() | |
+
+**Constraints**
+- reps > 0
+- weight >= 0
+- unit in ('lb', 'kg')
+- foreign keys enforced
+
+**Indexes**
+- index on session_id
+- index on exercise_id
+- (optional later) composite index on (exercise_id, session_id)
+
+---
+
 Database schema draft
 Design principles
 

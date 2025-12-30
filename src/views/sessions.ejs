@@ -1,0 +1,34 @@
+<h1>Sessions</h1>
+
+<h2>Add Session</h2>
+
+<form method="POST" action="/sessions">
+  <div>
+    <label>
+      Session Date:
+      <input type="date" name="session_date" required>
+    </label>
+  </div>
+
+  <div>
+    <label>
+      Notes:
+      <textarea name="notes"></textarea>
+    </label>
+  </div>
+
+  <button type="submit">Add Session</button>
+</form>
+
+<% if (!sessions || sessions.length === 0) { %>
+  <p>No sessions yet. Add some seed data or create a session.</p>
+<% } else { %>
+  <ul>
+    <% sessions.forEach(s => { %>
+      <li>
+        <strong><%= s.session_date %></strong> — <%= s.notes || "No notes" %>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+

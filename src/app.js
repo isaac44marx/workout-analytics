@@ -4,7 +4,10 @@
 
 const path = require("path");
 const express = require("express");
+require("dotenv").config();
 const expressLayouts = require("express-ejs-layouts");
+
+
 
 // Import route definitions
 const pageRoutes = require("./routes/pages");
@@ -40,6 +43,13 @@ app.set("layout", "partials/layout");
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 /*
+  MIDDLEWARE
+  ----------
+  Parse URL-encoded request bodies (form submissions)
+*/
+app.use(express.urlencoded({ extended: false }));
+
+/*
   ROUTES
   ------
   Hand off request handling to the routes module.
@@ -56,3 +66,4 @@ app.use("/", pageRoutes);
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });
+
