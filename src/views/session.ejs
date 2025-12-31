@@ -1,0 +1,16 @@
+<h1>Workout Session - <%= session.session_date %></h1>
+<p><strong>Notes:</strong> <%= session.notes || "No notes" %></p>
+<h2>Exercises in this Session</h2>
+<% if (!sets || sets.length === 0) { %>
+  <p>No exercises recorded for this session.</p>
+<% } else { %>
+  <ul>  
+    <% sets.forEach(set => { %>
+      <li>
+        <strong><%= set.exercise_name %></strong>
+        — Set <%= set.set_number ?? "?" %>,
+        <%= set.weight %> <%= set.unit %> × <%= set.reps %>
+      </li>
+    <% }) %>
+    </ul>
+<% } %>

@@ -99,6 +99,50 @@ router.post("/sessions", async (req, res) => {
   }
 });
 
+/*
+  GET /sessions/:id
+*/
+router.get("/sessions/:id", async (req, res) => {
+  try {
+    const sessionId = req.params.id;
+
+    const sessionResult = await query(
+      "SELECT * FROM workout_sessions WHERE id = $1",
+      [sessionId]
+    );
+
+    if (sessionResult.rows.length === 0) {
+      return res.status(404).send("Session not found");
+    }
+
+    const session = sessionResult.rows[0];
+
+    const setsResult = await query(
+      `
+      SELECT
+        se.*,
+        e.name AS exercise_name,
+        e.category AS exercise_category
+      FROM set_entries se
+      JOIN exercises e
+        ON se.exercise_id = e.id
+      WHERE se.session_id = $1
+      ORDER BY se.set_number ASC NULLS LAST, se.created_at ASC
+      `,
+      [sessionId]
+    );
+
+    res.render("session", {
+      title: `Workout Session - ${session.session_date}`,
+      session,
+      sets: setsResult.rows
+    });
+  } catch (err) {
+    console.error("SESSION DETAIL ERROR:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 router.get("/debug/db", async (req, res) => {
   try {
     const result = await query("SELECT NOW() as now");
