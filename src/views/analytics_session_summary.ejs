@@ -1,0 +1,41 @@
+<h1>Session Summary</h1>
+<% if (!sessions || sessions.length === 0) { %>
+  <p>No sessions recorded.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th class="center">Total Sets</th>
+        <th class="center">Distinct Exercises</th>
+        <th class="volume">Total Volume (lb)</th>
+        <th class="notes-col">Notes</th>
+        <th class="center">View Session</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% sessions.forEach(session => { %>
+        <tr>
+          <td>
+            <%= session.session_date.toLocaleDateString("en-US", {
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric"
+            }) %>
+          </td>
+          <td class="center"><%= session.total_sets %></td>
+          <td class="center"><%= session.distinct_exercises %></td>
+          <td class="volume">
+            <%= Number(session.total_volume_lb).toLocaleString() %>
+          </td>
+          <td class="notes-col"><%= session.notes || "-" %></td>
+          <td class="center">
+            <a href="/sessions/<%= session.id %>">
+            <button type="button">View</button>
+            </a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>

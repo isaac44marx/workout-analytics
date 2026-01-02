@@ -132,14 +132,121 @@ router.get("/sessions/:id", async (req, res) => {
       [sessionId]
     );
 
+    const exercisesResult = await query(
+      "SELECT id, name FROM exercises ORDER BY name ASC"
+    );
+
     res.render("session", {
       title: `Workout Session - ${session.session_date}`,
       session,
-      sets: setsResult.rows
+      sets: setsResult.rows,
+      exercises: exercisesResult.rows
     });
   } catch (err) {
     console.error("SESSION DETAIL ERROR:", err);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+/*
+  POST /sessions/:id/sets
+*/
+router.post("/sessions/:id/sets", async (req, res) => {
+  try {
+    const sessionId = req.params.id;
+    const { exercise_id, set_number, reps, weight, unit } = req.body;
+
+    await query(
+      "INSERT INTO set_entries (session_id, exercise_id, set_number, reps, weight, unit) VALUES ($1, $2, $3, $4, $5, $6)",
+      [sessionId, exercise_id, set_number, reps, weight, unit]
+    );
+
+    res.redirect(`/sessions/${sessionId}`);
+  } catch (err) {
+    console.error("CREATE SET ERROR:", err);
+    res.status(500).send("Error creating set");
+  }
+});
+
+/*
+  POST /sessions/:id/sets/:setId/delete
+*/
+router.post("/sessions/:id/sets/:setId/delete", async (req, res) => {
+  try {
+    const sessionId = req.params.id;
+    const setId = req.params.setId;
+
+    const result = await query(
+      "DELETE FROM set_entries WHERE id = $1 AND session_id = $2",
+      [setId, sessionId]
+    );
+    
+    if (result.rowCount === 0) {
+      return res.status(404).send("Set not found");
+    }
+
+    res.redirect(`/sessions/${sessionId}`);
+  } catch (err) {
+    console.error("DELETE SET ERROR:", err);
+    res.status(500).send("Error deleting set");
+  }
+});
+
+/*
+  GET /analytics/volume
+*/
+router.get("/analytics/volume", async (req, res) => {
+  try {
+    const result = await query(`
+      SELECT
+        e.id,
+        e.name,
+        COUNT(sev.id) AS total_sets,
+        SUM(sev.reps) AS total_reps,
+        ROUND(COALESCE(SUM(sev.volume_lb), 0)) AS total_volume_lb
+      FROM set_entries_with_volume sev
+      JOIN exercises e ON e.id = sev.exercise_id
+      GROUP BY e.id, e.name
+      ORDER BY total_volume_lb DESC;
+    `);
+
+    res.render("analytics_volume", {
+      title: "Total Volume by Exercise",
+      rows: result.rows
+    });
+  } catch (err) {
+    console.error("VOLUME ANALYTICS ERROR:", err);
+    res.status(500).send("Error fetching analytics");
+  }
+});
+
+/*
+  GET /analytics/session-summary
+*/
+router.get("/analytics/session-summary", async (req, res) => {
+  try {
+    const result = await query(`
+      SELECT
+        ws.id,
+        ws.session_date,
+        ws.notes,
+        COUNT(sev.id) AS total_sets,
+        COUNT(DISTINCT sev.exercise_id) AS distinct_exercises,
+        ROUND(COALESCE(SUM(sev.volume_lb), 0)) AS total_volume_lb
+      FROM workout_sessions ws
+      LEFT JOIN set_entries_with_volume sev
+        ON sev.session_id = ws.id
+      GROUP BY ws.id, ws.session_date, ws.notes
+      ORDER BY ws.session_date DESC;
+    `);
+
+    res.render("analytics_session_summary", {
+      title: "Session Summary",
+      sessions: result.rows
+    });
+  } catch (err) {
+    console.error("SESSION SUMMARY ERROR:", err);
+    res.status(500).send("Error loading session summary");
   }
 });
 

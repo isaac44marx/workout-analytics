@@ -23,12 +23,27 @@
 <% if (!sessions || sessions.length === 0) { %>
   <p>No sessions yet. Add some seed data or create a session.</p>
 <% } else { %>
-  <ul>
-    <% sessions.forEach(s => { %>
-      <li>
-        <strong><a href="/sessions/<%= s.id %>"><%= s.session_date %></a></strong> — <%= s.notes || "No notes" %>
-      </li>
-    <% }) %>
-  </ul>
+  <ul class="session-list">
+  <% sessions.forEach(s => { %>
+    <li class="session-row">
+      <div class="session-text">
+        <strong>
+          <%= s.session_date.toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric"
+          }) %>
+        </strong>
+        — <%= s.notes || "No notes" %>
+      </div>
+
+      <div class="session-action">
+        <a href="/sessions/<%= s.id %>">
+          <button type="button">View</button>
+        </a>
+      </div>
+    </li>
+  <% }) %>
+</ul>
 <% } %>
 

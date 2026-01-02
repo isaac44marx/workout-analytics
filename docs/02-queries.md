@@ -1,3 +1,10 @@
+# Analytics Queries
+
+This document contains both **planned analytics reports** and **implemented analytics reports**.
+Planned reports describe intended functionality; implemented reports document queries that exist in the codebase.
+
+## Planned Analytics Reports
+
 Analytics reports and query targets
 
 Each report below should have:
@@ -167,3 +174,36 @@ weekly_volume
 Notes
 
 Only if you add exercise categories
+
+## Implemented Analytics Reports
+
+### Lifetime Volume by Exercise
+
+**Route:** `/analytics/volume`  
+**Page:** `src/views/analytics-volume.ejs`
+
+#### Question
+How much total training volume have I performed for each exercise since I started logging workouts?
+
+#### Definition
+- **Volume (per set)** = `reps × weight`
+- **Lifetime volume (per exercise)** = sum of `reps × weight` across all logged sets for that exercise.
+
+#### Output columns
+- `name` — exercise name  
+- `total_sets` — total number of logged sets  
+- `total_reps` — total number of reps performed  
+- `total_volume` — sum of `reps × weight`
+
+#### SQL
+```sql
+SELECT
+  e.id,
+  e.name,
+  COUNT(*) AS total_sets,
+  SUM(se.reps) AS total_reps,
+  SUM(se.reps * se.weight) AS total_volume
+FROM set_entries se
+JOIN exercises e ON e.id = se.exercise_id
+GROUP BY e.id, e.name
+ORDER BY total_volume DESC;

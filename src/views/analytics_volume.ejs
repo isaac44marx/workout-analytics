@@ -1,0 +1,28 @@
+<h1>Lifetime Volume by Exercise</h1>
+
+<% if (!rows || rows.length === 0) { %>
+  <p>No data available. Make sure you have workout sessions with sets.</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Exercise Name</th>
+        <th class="center">Total Sets</th>
+        <th class="center">Total Reps</th>
+        <th class="volume">Total Volume (lb)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% rows.forEach(row => { %>
+        <tr>
+          <td><%= row.name %></td>
+          <td class="center"><%= row.total_sets %></td>
+          <td class="center"><%= row.total_reps %></td>
+          <td class="volume">
+            <%= Number(row.total_volume_lb).toLocaleString() %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>

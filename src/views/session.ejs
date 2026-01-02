@@ -1,4 +1,12 @@
-<h1>Workout Session - <%= session.session_date %></h1>
+<%
+  const sessionDate = session.session_date.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric"
+  });
+%>
+
+<h1>Workout Session - <%= sessionDate %></h1>
 <p><strong>Notes:</strong> <%= session.notes || "No notes" %></p>
 <h2>Exercises in this Session</h2>
 <% if (!sets || sets.length === 0) { %>
@@ -10,7 +18,55 @@
         <strong><%= set.exercise_name %></strong>
         — Set <%= set.set_number ?? "?" %>,
         <%= set.weight %> <%= set.unit %> × <%= set.reps %>
+
+        <form
+          method="POST"
+          action="/sessions/<%= session.id %>/sets/<%= set.id %>/delete"
+          style="display:inline"
+        >
+          <button type="submit">Delete</button>
+        </form>
       </li>
     <% }) %>
     </ul>
 <% } %>
+
+<form method="POST" action="/sessions/<%= session.id %>/sets">
+  <label>
+    Exercise:
+    <select name="exercise_id" required>
+      <% exercises.forEach(e => { %>
+        <option value="<%= e.id %>">
+          <%= e.name %>
+        </option>
+      <% }) %>
+    </select>
+  </label>
+
+  <label>
+    Set #:
+    <input type="number" name="set_number">
+  </label>
+
+  <label>
+    Reps:
+    <input type="number" name="reps" required>
+  </label>
+
+  <label>
+    Weight:
+    <input type="number" step="0.5" name="weight" required>
+  </label>
+
+  <label>
+    Unit:
+    <select name="unit" required>
+      <option value="lb">lb</option>
+      <option value="kg">kg</option>
+    </select>
+  </label>
+
+  <button type="submit">Add Set</button>
+</form>
+
+
