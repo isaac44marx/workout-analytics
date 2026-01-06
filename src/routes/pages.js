@@ -6,7 +6,6 @@ const { query } = require("../db/query");
 const express = require("express");
 
 // Create a router object.
-// A router is like a mini Express app that only handles routes.
 const router = express.Router();
 
 /*
@@ -269,5 +268,5 @@ router.get("/debug/db", async (req, res) => {
   }
 });
 
-// Export the router so app.js can "plug it in"
+// Export the router to be used in main app
 module.exports = router;
